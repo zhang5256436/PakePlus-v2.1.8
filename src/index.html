@@ -1,11 +1,1131 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus</title>
-    </head>
-    <body>
-        Hello World
-    </body>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>晚间任务跟踪评分系统</title>
+    <style>
+        /* 全局样式重置与基础设置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            color: #2d3748;
+        }
+
+        /* 容器样式 - 上下两部分 */
+        .section-container {
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e8e8e8;
+        }
+
+        /* 标题样式 */
+        .main-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #4299e1;
+            display: inline-block;
+        }
+
+        /* 日期显示 */
+        .date-display {
+            background: linear-gradient(135deg, #e8f4f8 0%, #f0f8fb 100%);
+            padding: 1.2rem 1.8rem;
+            border-radius: 14px;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+            color: #2563eb;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(66, 153, 225, 0.1);
+        }
+
+        /* 任务列表样式 */
+        .task-list {
+            margin-bottom: 2.5rem;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 1.4rem 1.8rem;
+            background-color: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 1.2rem;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .task-item:hover {
+            background-color: #f0f8fb;
+            transform: translateY(-3px);
+            border-left-color: #4299e1;
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.08);
+        }
+
+        .task-time {
+            min-width: 130px;
+            font-weight: 700;
+            color: #2563eb;
+            font-size: 1.05rem;
+            margin-right: 1.5rem;
+        }
+
+        .task-content {
+            flex: 1;
+            font-size: 1.05rem;
+            color: #1a202c;
+        }
+
+        .task-checkboxes {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-checkbox {
+            width: 22px;
+            height: 22px;
+            accent-color: #4299e1;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            font-size: 1rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        /* 分数显示与操作按钮 */
+        .score-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 2.5rem 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #f5f5f5 100%);
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .score-display {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .score-value {
+            font-size: 2.2rem;
+            color: #4299e1;
+            margin-left: 0.8rem;
+            font-weight: 800;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1.2rem;
+        }
+
+        .action-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .submit-btn {
+            background-color: #4299e1;
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background-color: #3182ce;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(66, 153, 225, 0.2);
+        }
+
+        .reset-btn {
+            background-color: #ed8936;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background-color: #dd6b20;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(237, 137, 54, 0.2);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 历史查询区域 */
+        .history-query {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .query-title {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .date-picker {
+            padding: 0.8rem 1.2rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #2d3748;
+            width: 220px;
+            margin-right: 1rem;
+        }
+
+        .query-btn {
+            padding: 0.8rem 1.8rem;
+            background-color: #38b2ac;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .query-btn:hover {
+            background-color: #319795;
+        }
+
+        .history-score {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            color: #2d3748;
+        }
+
+        .history-score-value {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* 统计区域样式 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.8rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #e8f4f8 100%);
+            border-radius: 14px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(66, 153, 225, 0.1);
+        }
+
+        .stat-title {
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-bottom: 1.2rem;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.8rem;
+            color: #2d3748;
+        }
+
+        .stat-average {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        /* 分数颜色样式 */
+        .score-red {
+            color: #e53e3e;
+        }
+
+        .score-yellow {
+            color: #ed8936;
+        }
+
+        .score-green {
+            color: #38a169;
+        }
+
+        /* 提示信息 */
+        .toast {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            padding: 1.2rem 2rem;
+            background-color: #1a202c;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(-20px);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 100分彩色奖励弹窗样式 */
+        .perfect-score-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            padding: 2rem 3rem;
+            background: transparent;
+            border: none;
+            border-radius: 20px;
+            box-shadow: none;
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.4s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .perfect-score-popup.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .perfect-score-text {
+            font-size: 6rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ff0000, #ff9900, #ffff00, #33cc33, #3399ff, #9933ff, #ff33cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 105, 180, 0.5);
+            animation: pulse 1.5s infinite;
+        }
+
+        /* 低分提示弹窗样式 */
+        .low-score-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            padding: 2rem 3rem;
+            background: transparent; /* 透明背景 */
+            border: none;
+            border-radius: 20px;
+            box-shadow: none;
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.4s ease;
+            text-align: center;
+        }
+
+        .low-score-popup.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .low-score-text {
+            font-size: 6rem;
+            font-weight: 800;
+            color: #e53e3e; /* 红色字体 */
+            /* 闪烁动画 - 速度加快一倍（时长从1s改为0.5s） */
+            animation: blink 0.5s infinite alternate;
+        }
+
+        /* 闪烁动画定义 - 速度加快一倍 */
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 0; }
+        }
+
+        /* 大拇指样式 */
+        .thumb-icon {
+            font-size: 5rem;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
+            animation: bounce 1.5s infinite alternate;
+        }
+
+        /* 烟花动画容器 */
+        .firework {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            pointer-events: none;
+        }
+
+        /* 动画定义 */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-20px); }
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .section-container {
+                padding: 1.5rem;
+            }
+
+            .task-item {
+                flex-wrap: wrap;
+                gap: 1.2rem;
+            }
+
+            .task-checkboxes {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .score-section {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1.5rem;
+            }
+
+            .btn-group {
+                width: 100%;
+            }
+
+            .action-btn {
+                flex: 1;
+                padding: 0.8rem 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                padding: 1.5rem;
+            }
+
+            .history-query {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .date-picker, .query-btn {
+                width: 100%;
+                margin-right: 0;
+            }
+
+            .perfect-score-popup, .low-score-popup {
+                padding: 1.5rem 2rem;
+                width: 90%;
+                gap: 1rem;
+            }
+
+            .perfect-score-text, .low-score-text {
+                font-size: 4rem;
+            }
+
+            .thumb-icon {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 第一部分：晚间任务跟踪 -->
+    <div class="section-container">
+        <div class="date-display" id="currentDateDisplay">
+            今日日期：<span id="todayDate"></span>
+        </div>
+
+        <h2 class="main-title">晚间任务跟踪评分系统</h2>
+        
+        <div class="task-list" id="taskList">
+            <div class="task-item">
+                <div class="task-time">18:00-18:30</div>
+                <div class="task-content">吃饭</div>
+                <div class="task-checkboxes">
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task1-complete" data-points="10">
+                        <label class="checkbox-label" for="task1-complete">完成</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task1-ontime" data-points="10">
+                        <label class="checkbox-label" for="task1-ontime">按时</label>
+                    </div>
+                </div>
+            </div>
+            <div class="task-item">
+                <div class="task-time">18:45-19:00</div>
+                <div class="task-content">写学校作业</div>
+                <div class="task-checkboxes">
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task2-complete" data-points="10">
+                        <label class="checkbox-label" for="task2-complete">完成</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task2-ontime" data-points="10">
+                        <label class="checkbox-label" for="task2-ontime">按时</label>
+                    </div>
+                </div>
+            </div>
+            <div class="task-item">
+                <div class="task-time">19:15-19:45</div>
+                <div class="task-content">写数学/英语作业</div>
+                <div class="task-checkboxes">
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task3-complete" data-points="10">
+                        <label class="checkbox-label" for="task3-complete">完成</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task3-ontime" data-points="10">
+                        <label class="checkbox-label" for="task3-ontime">按时</label>
+                    </div>
+                </div>
+            </div>
+            <div class="task-item">
+                <div class="task-time">20:00-20:15</div>
+                <div class="task-content">玩</div>
+                <div class="task-checkboxes">
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task4-complete" data-points="10">
+                        <label class="checkbox-label" for="task4-complete">完成</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task4-ontime" data-points="10">
+                        <label class="checkbox-label" for="task4-ontime">按时</label>
+                    </div>
+                </div>
+            </div>
+            <div class="task-item">
+                <div class="task-time">20:15-20:30</div>
+                <div class="task-content">吃水果/思考</div>
+                <div class="task-checkboxes">
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task5-complete" data-points="10">
+                        <label class="checkbox-label" for="task5-complete">完成</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task5-ontime" data-points="10">
+                        <label class="checkbox-label" for="task5-ontime">按时</label>
+                    </div>
+                </div>
+            </div>
+            <div class="task-item">
+                <div class="task-time">20:30-21:00</div>
+                <div class="task-content">看电视</div>
+                <div class="task-checkboxes">
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task6-complete" data-points="10">
+                        <label class="checkbox-label" for="task6-complete">完成</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task6-ontime" data-points="10">
+                        <label class="checkbox-label" for="task6-ontime">按时</label>
+                    </div>
+                </div>
+            </div>
+            <div class="task-item">
+                <div class="task-time">21:00-21:30</div>
+                <div class="task-content">听故事或读会儿书</div>
+                <div class="task-checkboxes">
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task7-complete" data-points="10">
+                        <label class="checkbox-label" for="task7-complete">完成</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" class="custom-checkbox task-option" id="task7-ontime" data-points="10">
+                        <label class="checkbox-label" for="task7-ontime">按时</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="score-section">
+            <div class="score-display">
+                今日得分：<span class="score-value" id="todayScore">100</span> 分
+            </div>
+            <div class="btn-group">
+                <button class="action-btn submit-btn" id="submitBtn" onclick="submitTodayData()">提交今日数据</button>
+                <button class="action-btn reset-btn" id="resetBtn" onclick="resetTodayData()" disabled>重置今日数据</button>
+            </div>
+        </div>
+
+        <div class="history-query">
+            <div class="query-title">历史分数查询</div>
+            <input type="date" class="date-picker" id="historyDatePicker">
+            <button class="query-btn" onclick="queryHistoryScore()">查询分数</button>
+            <div class="history-score" id="historyScoreDisplay">
+                请选择日期并点击查询
+            </div>
+        </div>
+    </div>
+
+    <!-- 第二部分：数据统计分析 -->
+    <div class="section-container">
+        <h2 class="main-title">数据统计分析</h2>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">总分数</div>
+                <div class="stat-value" id="totalScore">0</div>
+                <div class="stat-title">总平均分数</div>
+                <div class="stat-average" id="totalAvgScore">0</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-title">最近一周总分数</div>
+                <div class="stat-value" id="weekTotalScore">0</div>
+                <div class="stat-title">最近一周平均分数</div>
+                <div class="stat-average" id="weekAvgScore">0</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-title">最近一个月总分数</div>
+                <div class="stat-value" id="monthTotalScore">0</div>
+                <div class="stat-title">最近一个月平均分数</div>
+                <div class="stat-average" id="monthAvgScore">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    
+    <!-- 100分弹窗 -->
+    <div class="perfect-score-popup" id="perfectScorePopup">
+        <div class="thumb-icon">👍</div>
+        <div class="perfect-score-text">你好棒！</div>
+        <div class="thumb-icon">👍</div>
+    </div>
+
+    <!-- 低分提示弹窗 -->
+    <div class="low-score-popup" id="lowScorePopup">
+        <div class="low-score-text">你要挨踹了</div>
+    </div>
+
+    <script>
+        // 配置常量（便于维护）
+        const CONFIG = {
+            BASE_SCORE: 100,          // 基础分数
+            POINTS_PER_OPTION: 10,    // 每个选项的分数
+            MIN_SCORE: 0,             // 最低分数
+            POPUP_DURATION: 5000,     // 弹窗显示时长(ms)
+            TOAST_DURATION: 3000      // 提示框显示时长(ms)
+        };
+
+        // 全局状态管理
+        const appState = {
+            taskData: JSON.parse(localStorage.getItem('taskData')) || {},
+            currentDate: getFormattedDate(new Date()),
+            perfectScoreShown: false,
+            lowScoreShown: false,
+            isFirstLoad: true,
+            isSubmitted: false
+        };
+
+        // 页面加载初始化
+        window.onload = function() {
+            initApp();
+        };
+
+        /**
+         * 应用初始化入口
+         */
+        function initApp() {
+            // 基础初始化
+            syncWithSystemTime();
+            updateDateDisplay();
+            document.getElementById('historyDatePicker').value = appState.currentDate;
+            
+            // 初始化复选框状态
+            initCheckboxes();
+            
+            // 加载今日数据（如果有已提交的）
+            loadTodayTaskData();
+            
+            // 计算初始分数
+            calculateTodayScore(true);
+            
+            // 更新统计数据
+            updateAllStats();
+            
+            // 绑定事件监听
+            bindEvents();
+            
+            // 标记首次加载完成
+            appState.isFirstLoad = false;
+        }
+
+        /**
+         * 初始化所有复选框为勾选状态
+         */
+        function initCheckboxes() {
+            // 如果是新的一天/无历史数据，默认全部勾选
+            if (!appState.taskData[appState.currentDate] || !appState.taskData[appState.currentDate].submitted) {
+                document.querySelectorAll('.task-option').forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+            }
+        }
+
+        /**
+         * 绑定所有事件监听（统一管理）
+         */
+        function bindEvents() {
+            // 复选框变化监听
+            document.querySelectorAll('.task-option').forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    calculateTodayScore(false);
+                });
+            });
+        }
+
+        // 1. 格式化日期
+        function getFormattedDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // 2. 同步系统时间
+        function syncWithSystemTime() {
+            const now = new Date();
+            appState.currentDate = getFormattedDate(now);
+            showToast('已自动同步系统时间');
+        }
+
+        // 3. 更新日期显示
+        function updateDateDisplay() {
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('zh-CN', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            });
+            document.getElementById('todayDate').textContent = formattedDate;
+            appState.currentDate = getFormattedDate(now);
+        }
+
+        // 4. 计算今日分数（新逻辑：默认100分，取消勾选一个减10分，最低0分）
+        function calculateTodayScore(isInit) {
+            // 获取所有未勾选的选项数量
+            const uncheckedCount = document.querySelectorAll('.task-option:not(:checked)').length;
+            
+            // 计算分数：基础分 - 未勾选数 * 每个选项分数，最低0分
+            let score = CONFIG.BASE_SCORE - (uncheckedCount * CONFIG.POINTS_PER_OPTION);
+            score = Math.max(score, CONFIG.MIN_SCORE);
+            
+            // 更新分数显示
+            document.getElementById('todayScore').textContent = score;
+
+            // 重置弹窗标记
+            appState.lowScoreShown = score >= 80 ? false : appState.lowScoreShown;
+            appState.perfectScoreShown = score < 100 ? false : appState.perfectScoreShown;
+
+            // 非初始化且已提交时触发弹窗逻辑
+            if (!isInit && !appState.isFirstLoad && appState.isSubmitted) {
+                handleScorePopups(score);
+            }
+            
+            return score;
+        }
+
+        /**
+         * 根据分数处理弹窗显示
+         * @param {number} score - 当前分数
+         */
+        function handleScorePopups(score) {
+            // 100分弹窗
+            if (score === 100 && !appState.perfectScoreShown) {
+                showPerfectScorePopup();
+                appState.perfectScoreShown = true;
+                appState.lowScoreShown = false;
+            }
+            // 80分以下弹窗
+            else if (score < 80 && !appState.lowScoreShown) {
+                showLowScorePopup();
+                appState.lowScoreShown = true;
+                appState.perfectScoreShown = false;
+            }
+        }
+
+        // 5. 显示100分弹窗
+        function showPerfectScorePopup() {
+            const popup = document.getElementById('perfectScorePopup');
+            popup.classList.add('show');
+            
+            // 创建烟花效果
+            createFireworks();
+            
+            // 定时关闭弹窗
+            setTimeout(() => {
+                popup.classList.remove('show');
+                removeFireworks();
+            }, CONFIG.POPUP_DURATION);
+        }
+
+        // 6. 显示低分提示弹窗
+        function showLowScorePopup() {
+            const popup = document.getElementById('lowScorePopup');
+            popup.classList.add('show');
+            
+            // 定时关闭弹窗
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, CONFIG.POPUP_DURATION);
+        }
+
+        // 7. 创建烟花效果
+        function createFireworks() {
+            removeFireworks();
+            
+            const colors = ['#ff0000', '#ff9900', '#ffff00', '#33cc33', '#3399ff', '#9933ff', '#ff33cc'];
+            const popup = document.getElementById('perfectScorePopup');
+            
+            // 动态添加烟花动画样式（仅一次）
+            if (!document.querySelector('#firework-style')) {
+                const style = document.createElement('style');
+                style.id = 'firework-style';
+                style.textContent = `
+                    @keyframes fireworkBurst {
+                        0% { transform: scale(0); opacity: 1; }
+                        50% { transform: scale(1); opacity: 0.8; }
+                        100% { transform: scale(2); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // 创建10个烟花元素
+            for (let i = 0; i < 10; i++) {
+                const firework = document.createElement('div');
+                firework.className = 'firework';
+                firework.style.left = `${Math.random() * 100}%`;
+                firework.style.top = `${Math.random() * 100}%`;
+                firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                firework.style.borderRadius = '50%';
+                firework.style.animation = `fireworkBurst 1.5s ease-out forwards`;
+                popup.appendChild(firework);
+            }
+        }
+
+        // 8. 移除烟花效果
+        function removeFireworks() {
+            const popup = document.getElementById('perfectScorePopup');
+            const fireworks = popup.querySelectorAll('.firework');
+            fireworks.forEach(firework => firework.remove());
+        }
+
+        // 9. 提交今日数据
+        function submitTodayData() {
+            // 检查是否已提交
+            if (appState.taskData[appState.currentDate] && appState.taskData[appState.currentDate].submitted) {
+                showToast('当日已提交，不可重复提交！');
+                return;
+            }
+            
+            // 收集任务数据
+            const tasks = [];
+            document.querySelectorAll('.task-option').forEach((checkbox) => {
+                tasks.push({
+                    id: checkbox.id,
+                    checked: checkbox.checked,
+                    points: parseInt(checkbox.dataset.points)
+                });
+            });
+            
+            // 计算最终分数
+            const finalScore = calculateTodayScore(false);
+            appState.isSubmitted = true;
+            
+            // 保存数据
+            appState.taskData[appState.currentDate] = {
+                submitted: true,
+                score: finalScore,
+                tasks: tasks,
+                submitTime: new Date().toISOString()
+            };
+            localStorage.setItem('taskData', JSON.stringify(appState.taskData));
+            
+            // 更新按钮状态
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('resetBtn').disabled = false;
+            
+            // 更新统计数据
+            updateAllStats();
+            
+            // 显示提示
+            showToast(`提交成功！今日得分：${finalScore}分`);
+            
+            // 处理弹窗
+            handleScorePopups(finalScore);
+        }
+
+        // 10. 重置今日数据
+        function resetTodayData() {
+            if (confirm('确定要重置今日数据吗？重置后可重新提交。')) {
+                // 更新本地存储状态
+                if (appState.taskData[appState.currentDate]) {
+                    appState.taskData[appState.currentDate].submitted = false;
+                    localStorage.setItem('taskData', JSON.stringify(appState.taskData));
+                }
+                
+                // 重置所有复选框为勾选状态
+                document.querySelectorAll('.task-option').forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+                
+                // 重置分数和状态标记
+                calculateTodayScore(true);
+                appState.isSubmitted = false;
+                appState.perfectScoreShown = false;
+                appState.lowScoreShown = false;
+                
+                // 隐藏所有弹窗
+                document.getElementById('perfectScorePopup').classList.remove('show');
+                document.getElementById('lowScorePopup').classList.remove('show');
+                
+                // 更新按钮状态
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('resetBtn').disabled = true;
+                
+                // 更新统计数据
+                updateAllStats();
+                
+                // 显示提示
+                showToast('今日数据已重置，可以重新提交');
+            }
+        }
+
+        // 11. 加载今日任务数据
+        function loadTodayTaskData() {
+            if (appState.taskData[appState.currentDate] && appState.taskData[appState.currentDate].tasks) {
+                // 恢复复选框状态
+                appState.taskData[appState.currentDate].tasks.forEach(task => {
+                    const checkbox = document.getElementById(task.id);
+                    if (checkbox) checkbox.checked = task.checked;
+                });
+                
+                // 更新提交状态
+                if (appState.taskData[appState.currentDate].submitted) {
+                    document.getElementById('submitBtn').disabled = true;
+                    document.getElementById('resetBtn').disabled = false;
+                    appState.isSubmitted = true;
+                }
+            }
+        }
+
+        // 12. 查询历史分数
+        function queryHistoryScore() {
+            const queryDate = document.getElementById('historyDatePicker').value;
+            const historyScoreDisplay = document.getElementById('historyScoreDisplay');
+            
+            if (!queryDate) {
+                showToast('请选择要查询的日期！');
+                return;
+            }
+            
+            // 显示查询结果
+            if (appState.taskData[queryDate] && appState.taskData[queryDate].submitted) {
+                const score = appState.taskData[queryDate].score;
+                historyScoreDisplay.innerHTML = `
+                    ${queryDate} 的得分：<span class="history-score-value" id="historyScoreValue">${score}</span> 分
+                `;
+                updateScoreColor('historyScoreValue', score);
+            } else {
+                historyScoreDisplay.innerHTML = `${queryDate} 暂无提交数据`;
+            }
+        }
+
+        // 13. 更新所有统计数据
+        function updateAllStats() {
+            updateTotalStats();
+            updateWeekStats();
+            updateMonthStats();
+        }
+
+        // 14. 总统计
+        function updateTotalStats() {
+            let totalScore = 0;
+            let count = 0;
+            
+            // 遍历所有已提交的数据
+            for (const date in appState.taskData) {
+                if (appState.taskData[date].submitted) {
+                    totalScore += appState.taskData[date].score;
+                    count++;
+                }
+            }
+            
+            // 计算平均分
+            const avgScore = count > 0 ? Math.round(totalScore / count) : 0;
+            
+            // 更新显示
+            document.getElementById('totalScore').textContent = totalScore;
+            document.getElementById('totalAvgScore').textContent = avgScore;
+            updateScoreColor('totalAvgScore', avgScore);
+        }
+
+        // 15. 最近一周统计
+        function updateWeekStats() {
+            const now = new Date();
+            const oneWeekAgo = new Date(now);
+            oneWeekAgo.setDate(now.getDate() - 6);
+            
+            let totalScore = 0;
+            let count = 0;
+            
+            // 遍历近7天
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(oneWeekAgo);
+                date.setDate(oneWeekAgo.getDate() + i);
+                const formattedDate = getFormattedDate(date);
+                
+                if (appState.taskData[formattedDate] && appState.taskData[formattedDate].submitted) {
+                    totalScore += appState.taskData[formattedDate].score;
+                    count++;
+                }
+            }
+            
+            // 计算平均分
+            const avgScore = count > 0 ? Math.round(totalScore / count) : 0;
+            
+            // 更新显示
+            document.getElementById('weekTotalScore').textContent = totalScore;
+            document.getElementById('weekAvgScore').textContent = avgScore;
+            updateScoreColor('weekAvgScore', avgScore);
+        }
+
+        // 16. 最近一个月统计
+        function updateMonthStats() {
+            const now = new Date();
+            const oneMonthAgo = new Date(now);
+            oneMonthAgo.setMonth(now.getMonth() - 1);
+            
+            let totalScore = 0;
+            let count = 0;
+            
+            // 获取日期范围内的所有日期
+            const dates = getDatesInRange(oneMonthAgo, now);
+            dates.forEach(date => {
+                const formattedDate = getFormattedDate(date);
+                if (appState.taskData[formattedDate] && appState.taskData[formattedDate].submitted) {
+                    totalScore += appState.taskData[formattedDate].score;
+                    count++;
+                }
+            });
+            
+            // 计算平均分
+            const avgScore = count > 0 ? Math.round(totalScore / count) : 0;
+            
+            // 更新显示
+            document.getElementById('monthTotalScore').textContent = totalScore;
+            document.getElementById('monthAvgScore').textContent = avgScore;
+            updateScoreColor('monthAvgScore', avgScore);
+        }
+
+        // 17. 获取日期范围内的所有日期
+        function getDatesInRange(startDate, endDate) {
+            const dates = [];
+            const currentDate = new Date(startDate);
+            
+            while (currentDate <= endDate) {
+                dates.push(new Date(currentDate));
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            return dates;
+        }
+
+        // 18. 更新分数颜色
+        function updateScoreColor(elementId, score) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            // 移除原有颜色类
+            element.classList.remove('score-red', 'score-yellow', 'score-green');
+            
+            // 添加对应颜色类
+            score = parseFloat(score);
+            if (score < 80) {
+                element.classList.add('score-red');
+            } else if (score === 80) {
+                element.classList.add('score-yellow');
+            } else {
+                element.classList.add('score-green');
+            }
+        }
+
+        // 19. 显示提示框
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            // 定时隐藏
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, CONFIG.TOAST_DURATION);
+        }
+    </script>
+</body>
 </html>
